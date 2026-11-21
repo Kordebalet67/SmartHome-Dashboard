@@ -141,13 +141,13 @@ def recognize_capcha(driver: webdriver.Firefox) -> int:
     # Хорошо бы сделать яркость +25 и экспозицию -45, так точнее будет определяться
 
 
-
-    driver.get('https://www.prepostseo.com/ru/image-to-text')
+    temp_driver = webdriver.Firefox(options=firefox_options)
+    temp_driver.get('https://www.prepostseo.com/ru/image-to-text')
     # Находим скрытый input для загрузки файлов
-    file_input = driver.find_element(By.CSS_SELECTOR, "input[type='file']")
+    file_input = temp_driver.find_element(By.CSS_SELECTOR, "input[type='file']")
     # Если input скрыт, делаем его видимым через JavaScript
-    driver.execute_script("arguments[0].style.display = 'block';", file_input)
-    driver.execute_script("arguments[0].style.visibility = 'visible';", file_input)
+    temp_driver.execute_script("arguments[0].style.display = 'block';", file_input)
+    temp_driver.execute_script("arguments[0].style.visibility = 'visible';", file_input)
 
     # Указываем абсолютный путь к файлу
     file_path = os.path.abspath("capcha_temp/capcha.png")
@@ -157,17 +157,18 @@ def recognize_capcha(driver: webdriver.Firefox) -> int:
 
     # Жмем кнопку преобразовать
     # /html/body/main/section[1]/div[4]/div[3]/div[1]
-    wait = WebDriverWait(driver, 2)
+    wait = WebDriverWait(temp_driver, 2)
     convert_btn = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section[1]/div[4]/div[3]/div[1]')))
     convert_btn.click()
 
     # Забираем результат
     # //*[@id="result__text0"]
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(temp_driver, 20)
     capcha_text = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="result__text0"]')))
-    capcha_text = driver.find_element(By.XPATH, '//*[@id="result__text0"]').text
+    capcha_text = temp_driver.find_element(By.XPATH, '//*[@id="result__text0"]').text
     capcha_text = capcha_text.split('\n')
     print(capcha_text)
+    true_capcha = 0
     
     for item in capcha_text:
             print(item)
@@ -178,15 +179,22 @@ def recognize_capcha(driver: webdriver.Firefox) -> int:
                     if len(iter) == 4:
                         capcha = int(iter)
                         print(capcha)
+                        true_capcha = int(capcha)
                     
             elif len(item) == 4:
                 capcha = int(item)
                 print(capcha)
+                true_capcha = int(capcha)
             else:
-                capcha = int(item[:4])
-                print(capcha)
-
-
+                true_capcha = 6666
+                
+    temp_driver.close()
+    wait = WebDriverWait(driver, 20)
+    # XPATH поля ввода капчи страницы авторизации 
+    # //*[@id="cap_field"]
+    input_number = wait.until(EC.element_to_be_clickable((By.XPATH, '# //*[@id="cap_field"]')))
+    input_number.clear()
+    input_number.send_keys(true_capcha)
 
 
     return 0
