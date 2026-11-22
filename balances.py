@@ -168,33 +168,36 @@ def recognize_capcha(driver: webdriver.Firefox) -> int:
     capcha_text = temp_driver.find_element(By.XPATH, '//*[@id="result__text0"]').text
     capcha_text = capcha_text.split('\n')
     print(capcha_text)
-    true_capcha = 0
+    true_capcha = '0'
     
     for item in capcha_text:
-            print(item)
-            print(len(item))
-            if ' ' in item:
-                item_list = item.split()
-                for iter in item_list:
-                    if len(iter) == 4:
-                        capcha = int(iter)
-                        print(capcha)
-                        true_capcha = int(capcha)
+        if len(item) == 4:
+            true_capcha = item
+            print(true_capcha)
+            # print(item)
+            # print(len(item))
+            # if ' ' in item:
+            #     item_list = item.split()
+            #     for iter in item_list:
+            #         if len(iter) == 4:
+            #             capcha = int(iter)
+            #             print(capcha)
+            #             true_capcha = str(capcha)
                     
-            elif len(item) == 4:
-                capcha = int(item)
-                print(capcha)
-                true_capcha = int(capcha)
-            else:
-                true_capcha = 6666
+            # elif len(item) == 4:
+            #     capcha = int(item)
+            #     print(capcha)
+            #     true_capcha = str(capcha)
+            # else:
+            #     true_capcha = '6666'
                 
     temp_driver.close()
-    wait = WebDriverWait(driver, 20)
     # XPATH поля ввода капчи страницы авторизации 
     # //*[@id="cap_field"]
-    input_number = wait.until(EC.element_to_be_clickable((By.XPATH, '# //*[@id="cap_field"]')))
-    input_number.clear()
-    input_number.send_keys(true_capcha)
+    input_capcha = driver.find_element(By.XPATH, '# //*[@id="cap_field"]')
+    input_capcha.clear()
+    input_capcha.send_keys(true_capcha)
+    driver.close()
 
 
     return 0

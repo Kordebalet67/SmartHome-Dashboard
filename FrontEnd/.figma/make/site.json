@@ -1,0 +1,10 @@
+{
+  "description": "Customize your smart home dashboard with dynamic tiles for smart devices, internet balance, currency rates, and weather updates for selected cities.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
